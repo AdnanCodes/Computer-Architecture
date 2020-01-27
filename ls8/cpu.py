@@ -23,6 +23,16 @@ class CPU:
         self.MAR = "00000000"
         self.MDR = "00000000"
         self.FL = "00000000"
+        # Added instructions set for printing purposes
+        self.instruction = {"LDI": 0b10000010,
+                            "PRN": 0b01000111, "HLT": 0b00000001}
+
+# Functions for RAM read/write
+    def ram_read(self, address):
+        return self.ram[address]
+
+    def ram_write(self, address, value)
+    return self.ram[address] = value
 
     def load(self):
         """Load a program into memory."""
