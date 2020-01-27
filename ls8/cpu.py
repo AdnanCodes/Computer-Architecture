@@ -2,12 +2,27 @@
 
 import sys
 
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [0] * 256  # Ram with size of 256 bytes
+        self.R0 = 0
+        self.R1 = 0
+        self.R2 = 0
+        self.R3 = 0
+        self.R4 = 0
+        self.R5 = 0
+        self.R6 = 0
+        self.R7 = 0  # 8 Registers for the CPU
+        # Below are Internet Registers
+        self.PC = "00000000"
+        self.IR = "00000000"
+        self.MAR = "00000000"
+        self.MDR = "00000000"
+        self.FL = "00000000"
 
     def load(self):
         """Load a program into memory."""
@@ -18,25 +33,24 @@ class CPU:
 
         program = [
             # From print8.ls8
-            0b10000010, # LDI R0,8
+            0b10000010,  # LDI R0,8
             0b00000000,
             0b00001000,
-            0b01000111, # PRN R0
+            0b01000111,  # PRN R0
             0b00000000,
-            0b00000001, # HLT
+            0b00000001,  # HLT
         ]
 
         for instruction in program:
             self.ram[address] = instruction
             address += 1
 
-
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        # elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -47,12 +61,12 @@ class CPU:
         """
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
-            self.pc,
-            #self.fl,
-            #self.ie,
-            self.ram_read(self.pc),
-            self.ram_read(self.pc + 1),
-            self.ram_read(self.pc + 2)
+            self.PC,
+            # self.fl,
+            # self.ie,
+            self.ram_read(self.PC),
+            self.ram_read(self.PC + 1),
+            self.ram_read(self.PC + 2)
         ), end='')
 
         for i in range(8):
