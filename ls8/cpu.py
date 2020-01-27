@@ -9,20 +9,13 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 256  # Ram with size of 256 bytes
-        self.R0 = 0
-        self.R1 = 0
-        self.R2 = 0
-        self.R3 = 0
-        self.R4 = 0
-        self.R5 = 0
-        self.R6 = 0
-        self.R7 = 0  # 8 Registers for the CPU
-        # Below are Internet Registers
-        self.PC = "00000000"
-        self.IR = "00000000"
-        self.MAR = "00000000"
-        self.MDR = "00000000"
-        self.FL = "00000000"
+        self.reg = [0] * 8
+        # Below are Internal Registers
+        self.pc = 0  # Program Counter
+        self.ir = "00000000"
+        self.mar = "00000000"
+        self.mdr = "00000000"
+        self.fl = "00000000"
         # Added instructions set for printing purposes
         self.instruction = {"LDI": 0b10000010,
                             "PRN": 0b01000111, "HLT": 0b00000001}
@@ -71,12 +64,12 @@ class CPU:
         """
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
-            self.PC,
+            self.pc,
             # self.fl,
             # self.ie,
-            self.ram_read(self.PC),
-            self.ram_read(self.PC + 1),
-            self.ram_read(self.PC + 2)
+            self.ram_read(self.pc),
+            self.ram_read(self.pc + 1),
+            self.ram_read(self.pc + 2)
         ), end='')
 
         for i in range(8):
@@ -86,4 +79,16 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        # Perform REPL style execution
+
+        while True:
+            # Start the CPU. start storing instructions in IR
+            self.ir = self.ram_read(self.pc)
+            # Exit the program when Instruction HLT is read
+            if self.ir = self.instruction["HLT"]:
+                break
+            # Execute other instructions
+            elif self.ir = self.instruction["LDI"]:
+                pass
+            elif self.ir = self.instruction["PRN"]:
+                pass
