@@ -13,10 +13,7 @@ class CPU:
         # Below are Internal Registers
         self.pc = 0  # Program Counter
         self.ir = "00000000"
-        self.mar = "00000000"
-        self.mdr = "00000000"
-        self.fl = "00000000"
-        # Added instructions set for printing purposes
+        # Added instructions set
         self.instruction = {"LDI": 0b10000010,
                             "PRN": 0b01000111, "HLT": 0b00000001}
 
@@ -24,8 +21,8 @@ class CPU:
     def ram_read(self, address):
         return self.ram[address]
 
-    def ram_write(self, address, value)
-    return self.ram[address] = value
+    def ram_write(self, address, value):
+        self.ram[address] = value
 
     def load(self):
         """Load a program into memory."""
@@ -80,15 +77,25 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # Perform REPL style execution
-
-        while True:
+        running = True
+        while running:
+            ()
             # Start the CPU. start storing instructions in IR
             self.ir = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc+1)
+            operand_b = self.ram_read(self.pc+2)
             # Exit the program when Instruction HLT is read
-            if self.ir = self.instruction["HLT"]:
-                break
+            if self.ir == self.instruction["HLT"]:
+                running = False
+                self.pc += 1
             # Execute other instructions
-            elif self.ir = self.instruction["LDI"]:
-                pass
-            elif self.ir = self.instruction["PRN"]:
-                pass
+            elif self.ir == self.instruction["LDI"]:
+                # Immediate set value of register to an intger
+                self.reg[operand_a] = 8
+                self.pc += 3
+            elif self.ir == self.instruction["PRN"]:
+                print(self.reg[operand_a])
+                self.pc += 2
+            else:
+                print(f"Eroor: Unknown Command {self.ir}")
+                sys.exit(1)
