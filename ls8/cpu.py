@@ -15,7 +15,7 @@ class CPU:
         self.ir = "00000000"
         # Added instructions set
         self.instruction = {"LDI": 0b10000010,
-                            "PRN": 0b01000111, "HLT": 0b00000001}
+                            "PRN": 0b01000111, "HLT": 0b00000001, "MUL": 0b10100010}
 
 # Functions for RAM read/write
     def ram_read(self, address):
@@ -50,6 +50,9 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         # elif op == "SUB": etc
+        if op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
+            return self.reg[reg_a]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -78,7 +81,6 @@ class CPU:
         # Perform REPL style execution
         running = True
         while running:
-            ()
             # Start the CPU. start storing instructions in IR
             self.ir = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc+1)
@@ -90,11 +92,14 @@ class CPU:
             # Execute other instructions
             elif self.ir == self.instruction["LDI"]:
                 # Immediate set value of register to an intger
-                self.reg[operand_a] = 8
+                self.reg[operand_a] = operand_b
                 self.pc += 3
             elif self.ir == self.instruction["PRN"]:
                 print(self.reg[operand_a])
                 self.pc += 2
+            elif self.ir == self.instruction["MUL"]:
+                print(self.alu("MUL", operand_a, operand_b))
+                self.pc += 3
             else:
                 print(f"Eroor: Unknown Command {self.ir}")
                 sys.exit(1)
