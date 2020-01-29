@@ -2,6 +2,12 @@
 
 import sys
 
+# Hardcoding variables for branch table
+LDI = 0b10000010
+PRN = 0b01000111
+MUL = 0b10100010
+HLT = 0b00000001
+
 
 class CPU:
     """Main CPU class."""
@@ -14,10 +20,15 @@ class CPU:
         self.pc = 0  # Program Counter
         self.ir = "00000000"
         # Added instructions set
-        self.instruction = {"LDI": 0b10000010,
-                            "PRN": 0b01000111, "HLT": 0b00000001, "MUL": 0b10100010}
+        self.instruction = {}
+        self.instruction[LDI] = self.handle_LDI
+        self.instruction[PRN] = self.handle_PRN
+        self.instruction[MUL] = self.handle_MUL
+
 
 # Functions for RAM read/write
+
+
     def ram_read(self, address):
         return self.ram[address]
 
@@ -75,30 +86,36 @@ class CPU:
 
         print()
 
+    def handle_LDI(self, operand_a, operand_b):
+        self.reg[operand_a] = operand_b
+        self.pc += 3
+
+    def handle_PRN(self, operand_a, operand_b):
+        print(f"Print to Console - {self.reg[operand_a]}")
+        self.pc += 2
+
+    def handle_MUL(self, operand_a, operand_b):
+        self.alu("MUL", operand_a, operand_b)
+        self.pc += 3
+
     def run(self):
         """Run the CPU."""
         # Perform REPL style execution
         running = True
+        #
+
         while running:
             # Start the CPU. start storing instructions in IR
             self.ir = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc+1)
             operand_b = self.ram_read(self.pc+2)
-            # Exit the program when Instruction HLT is read
-            if self.ir == self.instruction["HLT"]:
+            # For some reason, loop would try to go on after HLT instruction it would go to self.ir = 1 and throw exception message
+            if self.ir == HLT:
                 running = False
-                self.pc += 1
-            # Execute other instructions
-            elif self.ir == self.instruction["LDI"]:
-                # Immediate set value of register to an intger
-                self.reg[operand_a] = operand_b
-                self.pc += 3
-            elif self.ir == self.instruction["PRN"]:
-                print(self.reg[operand_a])
-                self.pc += 2
-            elif self.ir == self.instruction["MUL"]:
-                self.alu("MUL", operand_a, operand_b)
-                self.pc += 3
-            else:
-                print(f"Eroor: Unknown Command {self.ir}")
+                break
+            # try to engage the reads from program and excecute instructions
+            try:
+                self.instruction[self.ir](operand_a, operand_b)
+            except:
+                print(f"Error: Unknown Command {self.ir}")
                 sys.exit(1)
