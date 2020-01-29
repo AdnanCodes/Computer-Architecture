@@ -7,6 +7,9 @@ LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
 HLT = 0b00000001
+POP = 0b01000110
+PUSH = 0b01000101
+SP = 7  # Stack pointer is Register 7
 
 
 class CPU:
@@ -24,6 +27,8 @@ class CPU:
         self.instruction[LDI] = self.handle_LDI
         self.instruction[PRN] = self.handle_PRN
         self.instruction[MUL] = self.handle_MUL
+        self.instruction[POP] = self.handle_POP
+        self.instruction[PUSH] = self.handle_PUSH
 
 
 # Functions for RAM read/write
@@ -98,17 +103,30 @@ class CPU:
         self.alu("MUL", operand_a, operand_b)
         self.pc += 3
 
+    def handle_POP(self, operand_a, operand_b):
+        value = self.ram[self.reg[SP]]
+        self.reg[operand_a] = value
+        self.reg[SP] += 1
+        self.pc += 2
+
+    def handle_PUSH(self, operand_a, operand_b):
+        value = self.reg[operand_a]
+        self.reg[SP] -= 1
+        self.ram[self.reg[SP]] = value
+        self.pc += 2
+
     def run(self):
         """Run the CPU."""
         # Perform REPL style execution
         running = True
-        #
-
+        # Before the loop starts, initialize stack pointer
+        self.reg[SP] = 0xF4
         while running:
             # Start the CPU. start storing instructions in IR
             self.ir = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc+1)
             operand_b = self.ram_read(self.pc+2)
+
             # For some reason, loop would try to go on after HLT instruction it would go to self.ir = 1 and throw exception message
             if self.ir == HLT:
                 running = False
