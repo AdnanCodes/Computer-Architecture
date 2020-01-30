@@ -6,9 +6,12 @@ import sys
 LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
+ADD = 0b10100000
 HLT = 0b00000001
 POP = 0b01000110
 PUSH = 0b01000101
+CALL = 0b01010000
+RET = 0b00010001
 SP = 7  # Stack pointer is Register 7
 
 
@@ -29,6 +32,9 @@ class CPU:
         self.instruction[MUL] = self.handle_MUL
         self.instruction[POP] = self.handle_POP
         self.instruction[PUSH] = self.handle_PUSH
+        self.instruction[CALL] = self.handle_CALL
+        self.instruction[RET] = self.handle_RET
+        self.instruction[ADD] = self.handle_ADD
 
 
 # Functions for RAM read/write
@@ -66,7 +72,7 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         # elif op == "SUB": etc
-        if op == "MUL":
+        elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
@@ -103,6 +109,10 @@ class CPU:
         self.alu("MUL", operand_a, operand_b)
         self.pc += 3
 
+    def handle_ADD(self, operand_a, operand_b):
+        self.alu("ADD", operand_a, operand_b)
+        self.pc += 3
+
     def handle_POP(self, operand_a, operand_b):
         value = self.ram[self.reg[SP]]
         self.reg[operand_a] = value
@@ -114,6 +124,18 @@ class CPU:
         self.reg[SP] -= 1
         self.ram[self.reg[SP]] = value
         self.pc += 2
+
+    def handle_CALL(self, operand_a, operand_b):
+        value = self.pc + 2
+        self.reg[SP] -= 1
+        self.ram[self.reg[SP]] = value
+        subroutine_address = self.reg[operand_a]
+        self.pc = subroutine_address
+
+    def handle_RET(self, operand_a, operand_b):
+        return_address = self.reg[SP]
+        self.reg[SP] += 1
+        self.pc = self.ram[return_address]
 
     def run(self):
         """Run the CPU."""
