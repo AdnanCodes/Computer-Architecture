@@ -12,6 +12,10 @@ POP = 0b01000110
 PUSH = 0b01000101
 CALL = 0b01010000
 RET = 0b00010001
+CMP = 0b10100111
+JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110
 SP = 7  # Stack pointer is Register 7
 
 
@@ -24,7 +28,8 @@ class CPU:
         self.reg = [0] * 8
         # Below are Internal Registers
         self.pc = 0  # Program Counter
-        self.ir = "00000000"
+        self.ir = 0b00000000
+        self.fl = 0b00000000  # Set the flag for CMP as 0 for not equal values
         # Added instructions set
         self.instruction = {}
         self.instruction[LDI] = self.handle_LDI
@@ -38,7 +43,6 @@ class CPU:
 
 
 # Functions for RAM read/write
-
 
     def ram_read(self, address):
         return self.ram[address]
@@ -74,6 +78,15 @@ class CPU:
         # elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.fl = 0b00000001
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                self.fl = 0b00000100
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.fl = 0b00000010
+            else:
+                self.fl = 0b00000000
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -136,6 +149,18 @@ class CPU:
         return_address = self.reg[SP]
         self.reg[SP] += 1
         self.pc = self.ram[return_address]
+
+    def handle_CMP(self, operand_a, operand_b):
+        pass
+
+    def handle_JMP(self, operand_a, operand_b):
+        pass
+
+    def handle_JEQ(self, operand_a, operand_b):
+        pass
+
+    def handle_JNE(self, operand_a, operand_b):
+        pass
 
     def run(self):
         """Run the CPU."""
