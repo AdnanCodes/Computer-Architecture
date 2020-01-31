@@ -40,9 +40,14 @@ class CPU:
         self.instruction[CALL] = self.handle_CALL
         self.instruction[RET] = self.handle_RET
         self.instruction[ADD] = self.handle_ADD
+        self.instruction[CMP] = self.handle_CMP
+        self.instruction[JMP] = self.handle_JMP
+        self.instruction[JEQ] = self.handle_JEQ
+        self.instruction[JNE] = self.handle_JNE
 
 
 # Functions for RAM read/write
+
 
     def ram_read(self, address):
         return self.ram[address]
@@ -151,16 +156,23 @@ class CPU:
         self.pc = self.ram[return_address]
 
     def handle_CMP(self, operand_a, operand_b):
-        pass
+        self.alu("CMP", operand_a, operand_b)
+        self.pc += 3
 
     def handle_JMP(self, operand_a, operand_b):
-        pass
+        self.pc = self.reg[operand_a]
 
     def handle_JEQ(self, operand_a, operand_b):
-        pass
+        if self.fl == 0b00000001:
+            self.handle_JMP(operand_a, operand_b)
+        else:
+            self.pc += 2
 
     def handle_JNE(self, operand_a, operand_b):
-        pass
+        if self.fl == 0b00000100:
+            self.handle_JMP(operand_a, operand_b)
+        else:
+            self.pc += 2
 
     def run(self):
         """Run the CPU."""
